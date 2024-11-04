@@ -53,6 +53,19 @@ class TiendaApplicationTests {
 	void test1() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		record Tupla (String nombre, double precio){}
+		var result = listProds.stream()
+				.map(p -> new Tupla(p.getNombre(), p.getPrecio()))
+				.toList();
+
+		// Encabezado de la tabla
+		System.out.printf("%-35s %-10s%n", "Nombre producto", "Precio");
+		System.out.println("-----------------------------------------------");
+
+		// Imprimir cada producto en formato de tabla
+		result.forEach(tupla ->
+				System.out.printf("%-35s %-10.2f%n", tupla.nombre(), tupla.precio())
+		);
 	}
 	
 	
@@ -63,6 +76,24 @@ class TiendaApplicationTests {
 	void test2() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		record Tupla (String nombre, double precio){}
+		var result = listProds.stream()
+				.map(p -> new Tupla(p.getNombre(), convertirEurosDolares(p.getPrecio())))
+				.toList();
+
+		System.out.printf("%-35s %-10s%n", "Nombre producto", "Precio");
+		System.out.println("-----------------------------------------------");
+
+		// Imprimir cada producto en formato de tabla
+		result.forEach(tupla ->
+				System.out.printf("%-35s %-10.2f%n", tupla.nombre(), tupla.precio())
+		);
+
+
+	}
+	public static double convertirEurosDolares(double euros){
+		final Double TASA_DE_CAMBIO=1.08;
+		return euros * TASA_DE_CAMBIO;
 	}
 	
 	/**
@@ -72,6 +103,18 @@ class TiendaApplicationTests {
 	void test3() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		record Tupla (String nombre, double precio){}
+		var result = listProds.stream()
+				.map(p -> new Tupla(p.getNombre().toUpperCase(), p.getPrecio()))
+				.toList();
+
+		System.out.printf("%-35s %-10s%n", "Nombre producto", "Precio");
+		System.out.println("-----------------------------------------------");
+
+		// Imprimir cada producto en formato de tabla
+		result.forEach(tupla ->
+				System.out.printf("%-35s %-10.2f%n", tupla.nombre(), tupla.precio())
+		);
 	}
 	
 	/**
@@ -81,15 +124,51 @@ class TiendaApplicationTests {
 	void test4() {
 		var listFabs = fabRepo.findAll();
 		//TODO
+		record Tupla (String nombre){}
+		var listaFabricantes = listFabs.stream()
+				.map(p -> new Tupla(capitalizeFirstTwoLetters(p.getNombre())))
+				.toList();
+
+		System.out.printf("%-35s%n", "Nombre fabricante");
+		System.out.println("------------------------");
+
+		// Imprimir cada producto en formato de tabla
+		listaFabricantes.forEach(tupla ->
+				System.out.printf("%-35s%n", tupla.nombre())
+		);
+
 	}
-	
+
+	public static String capitalizeFirstTwoLetters(String input){
+
+		if(input.length()==2) {
+			input = input.toUpperCase();
+		}else {
+			input=input.substring(0, 2).toUpperCase() + input.substring(2);
+		}
+
+		return input;
+
+	}
 	/**
 	 * 5. Lista el código de los fabricantes que tienen productos.
 	 */
 	@Test
 	void test5() {
 		var listFabs = fabRepo.findAll();
-		//TODO		
+		//TODO
+		record Tupla(Integer codigoFabricante){}
+		var result = listFabs.stream()
+				.filter(f -> !f.getProductos().isEmpty())
+				.map(f -> new Tupla(f.getCodigo()))
+				.toList();
+
+		System.out.printf("%-35s%n", "Codigo");
+		System.out.println("------------------------");
+
+		result.forEach( tupla ->
+				System.out.printf("%-35d%n", tupla.codigoFabricante())
+		);
 	}
 	
 	/**
@@ -535,7 +614,6 @@ Hewlett-Packard              2
 	void test38() {
 		var listFabs = fabRepo.findAll();
 		//TODO
-		listFabs.stream()
 	}
 	
 	/**
