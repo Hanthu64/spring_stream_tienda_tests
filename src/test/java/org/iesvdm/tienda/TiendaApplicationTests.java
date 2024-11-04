@@ -4,10 +4,15 @@ import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
 import org.iesvdm.tienda.repository.ProductoRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
+import java.util.OptionalDouble;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 
 @SpringBootTest
@@ -249,6 +254,17 @@ class TiendaApplicationTests {
 	@Test
 	void test23() {
 		var listProds = prodRepo.findAll();
+
+		var listAyuda = listProds.stream()
+				.sorted(comparing(producto -> producto.getFabricante().getNombre()))
+				.map(producto -> producto.getNombre()
+						+ producto.getPrecio()
+						+ producto.getFabricante().getNombre())
+				.toList();
+
+		listAyuda.forEach(System.out::println);
+
+		Assertions.assertEquals(listAyuda, listProds);
 		//TODO
 	}
 	
@@ -356,6 +372,13 @@ Fabricante: Xiaomi
 	@Test
 	void test28() {
 		var listFabs = fabRepo.findAll();
+		listFabs.stream()
+				.map(fabricante -> "Fabricante: " + fabricante.getNombre()+"\n\n"
+						+ "Productos: "+"\n"
+						+ fabricante.getProductos()
+								.stream().map(producto -> producto.getNombre()+"\n")
+								.collect(Collectors.joining()))
+								.forEach(System.out::println);
 		//TODO
 	}
 	
@@ -367,7 +390,7 @@ Fabricante: Xiaomi
 		var listFabs = fabRepo.findAll();
 		//TODO
 	}
-	
+
 	/**
 	 * 30. Calcula el número total de productos que hay en la tabla productos. Utiliza la api de stream.
 	 */
@@ -375,6 +398,11 @@ Fabricante: Xiaomi
 	void test30() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		var numProds = listProds.stream()
+				.count();
+		System.out.println(numProds);
+
+		Assertions.assertEquals(11, listProds.size());
 	}
 
 	
@@ -385,6 +413,10 @@ Fabricante: Xiaomi
 	void test31() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		var result = listProds.stream()
+				.map(Producto::getFabricante).distinct().count();
+
+				Assertions.assertEquals(7, result);
 	}
 	
 	/**
@@ -394,6 +426,9 @@ Fabricante: Xiaomi
 	void test32() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		var result = listProds.stream().mapToDouble(p -> p.getPrecio())
+				.average();
+		Assertions.assertEquals(271.7236363636364, result.orElse(0.0));
 	}
 	
 	/**
@@ -403,6 +438,10 @@ Fabricante: Xiaomi
 	void test33() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		OptionalDouble preciomin = listProds.stream()
+				.mapToDouble(p -> p.getPrecio())
+				.min();
+		Assertions.assertEquals(59.99, preciomin.orElse(0.0));
 	}
 	
 	/**
@@ -420,7 +459,12 @@ Fabricante: Xiaomi
 	@Test
 	void test35() {
 		var listProds = prodRepo.findAll();
-		//TODO		
+		//TODO
+		var numProds = listProds.stream()
+				.filter(producto -> producto.getFabricante().getNombre().equals("Asus"))
+				.count();
+		Assertions.assertEquals(2, numProds);
+
 	}
 	
 	/**
@@ -430,6 +474,13 @@ Fabricante: Xiaomi
 	void test36() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		var mediaProds = listProds.stream()
+				.filter(producto -> producto.getFabricante().getNombre().equals("Asus"))
+				.mapToDouble(Producto::getPrecio)
+				.average()
+				.orElse(0.0);
+
+		Assertions.assertEquals(223.995, mediaProds);
 	}
 	
 	
@@ -441,6 +492,23 @@ Fabricante: Xiaomi
 	void test37() {
 		var listProds = prodRepo.findAll();
 		//TODO
+		var result = listProds.stream()
+				.filter(producto -> producto.getFabricante().getNombre().equalsIgnoreCase("Crucial"))
+				.map(producto -> new Double[]{
+						producto.getPrecio(), producto.getPrecio(), producto.getPrecio(), 0.0})
+				.reduce((doubles, doubles2) -> new Double[]{
+						Math.min(doubles[0], doubles2[0]),
+						Math.max(doubles[1], doubles2[1]),
+						doubles[2] + doubles2[2],
+						doubles[3]++
+				})
+				.orElse(new Double[]{});
+
+		Double media = result[3]>0 ? result[2]/result[3]: 0.0;
+		System.out.println(result[0]);
+		System.out.println(result[1]);
+		System.out.println(media);
+
 	}
 	
 	/**
@@ -467,6 +535,7 @@ Hewlett-Packard              2
 	void test38() {
 		var listFabs = fabRepo.findAll();
 		//TODO
+		listFabs.stream()
 	}
 	
 	/**
