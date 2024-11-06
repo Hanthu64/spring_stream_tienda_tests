@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.min;
 import static java.util.Comparator.comparing;
+import static sun.jvm.hotspot.runtime.VMObjectFactory.newObject;
 
 
 @SpringBootTest
@@ -614,6 +616,16 @@ Hewlett-Packard              2
 	void test38() {
 		var listFabs = fabRepo.findAll();
 		//TODO
+		var numProd = listFabs
+				.stream()
+				.map(f -> f.getNombre() + " " + f.getProductos().size())
+				.toList();
+
+		System.out.printf("%36s | %36s | %n" , "Fabricante", "#productos");
+		System.out.println("----------------------------------------------------");
+		listFabs.forEach(f -> {
+				System.out.printf("%36s | %36s | %n", f.getNombre(), f.getProductos().size());
+		});
 	}
 	
 	/**
@@ -625,6 +637,33 @@ Hewlett-Packard              2
 	void test39() {
 		var listFabs = fabRepo.findAll();
 		//TODO
+
+		listFabs.stream()
+				.flatMap(f -> f.getProductos().stream())
+				.mapToDouble(p -> p.getPrecio())
+				.min().ifPresentOrElse(resultado -> System.out.println(resultado), () -> System.out.println("Nada"));
+
+		System.out.println(listFabs);
+		var resultmin = listFabs.stream()
+				.flatMap(f -> f.getProductos().stream())
+				.mapToDouble(p -> p.getPrecio())
+				.min()
+				.orElse(0.0);
+		System.out.println(resultmin);
+
+		var resultmax = listFabs.stream()
+				.flatMap(f -> f.getProductos().stream())
+				.mapToDouble(p -> p.getPrecio())
+				.max()
+				.orElse(0.0);
+		System.out.println(resultmax);
+
+		var resultmedio = listFabs.stream()
+				.flatMap(f -> f.getProductos().stream())
+				.mapToDouble(p -> p.getPrecio())
+				.average()
+				.orElse(0.0);
+		System.out.println(resultmedio);
 	}
 	
 	/**
@@ -635,6 +674,30 @@ Hewlett-Packard              2
 	void test40() {
 		var listFabs = fabRepo.findAll();
 		//TODO
+		var result = listFabs.stream()
+				.filter(f -> f.getProductos().stream()
+						.mapToDouble(p -> p.getPrecio())
+								.average()
+								.orElse(0)>=200)
+						.map(f -> new Object() {
+							int codFab = f.getCodigo();
+							double resultmin = f.getProductos().stream()
+									.mapToDouble(p -> p.getPrecio())
+									.min()
+									.orElse(0.0);
+
+							double resultmax = f.getProductos().stream()
+									.mapToDouble(p -> p.getPrecio())
+									.max()
+									.orElse(0.0);
+
+							double resultmedio = f.getProductos().stream()
+									.mapToDouble(p -> p.getPrecio())
+									.average()
+									.orElse(0.0);
+							long total = f.getProductos().size();
+						}
+
 	}
 	
 	/**
